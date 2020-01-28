@@ -169,7 +169,6 @@ const chai = require("chai")
 const { Pact } = require("@pact-foundation/pact")
 const chaiAsPromised = require("chai-as-promised")
 const expect = chai.expect
-
 chai.use(chaiAsPromised)
 
 describe("Pact", () => {
@@ -202,47 +201,48 @@ describe("Pact", () => {
 
   context("when there are a list of projects", () => {
     describe("and there is a valid user session", () => {
-      before(() => provider
+      before(() =>
+        provider
           // (2) Start the mock server
           .setup()
           // (3) add interactions to the Mock Server, as many as required
           .then(() => provider.addInteraction({
-              // The 'state' field specifies a "Provider State"
-              state: "i have a list of projects",
-              uponReceiving: "a request for projects",
-              withRequest: {
-                method: "GET",
-                path: "/projects",
-                headers: { Accept: "application/json" },
-              },
-              willRespondWith: {
-                status: 200,
-                headers: { "Content-Type": "application/json" },
-                body: EXPECTED_BODY,
-              },
-            })
+            // The 'state' field specifies a "Provider State"
+            state: "i have a list of projects",
+            uponReceiving: "a request for projects",
+            withRequest: {
+              method: "GET",
+              path: "/projects",
+              headers: { Accept: "application/json" },
+            },
+            willRespondWith: {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+              body: EXPECTED_BODY,
+            },
           })
-      })
-
-      // (4) write your test(s)
-      it("generates a list of TODOs for the main screen", async () => {
-        const projects = await todoApp.getProjects() // <- this method would make the remote http call
-        expect(projects).to.be.a("array")
-        expect(projects).to.have.deep.property("projects[0].id", 1)
-      })
-
-      // (5) validate the interactions you've registered and expected occurred
-      // this will throw an error if it fails telling you what went wrong
-      // This should be performed once per interaction test
-      afterEach(() => provider.verify())
+          )
+      )
     })
 
-    // (6) write the pact file for this consumer-provider pair,
-    // and shutdown the associated mock server.
-    // You should do this only _once_ per Provider you are testing,
-    // and after _all_ tests have run for that suite
-    after(() =>  provider.finalize())
+    // (4) write your test(s)
+    it("generates a list of TODOs for the main screen", async () => {
+      const projects = await todoApp.getProjects() // <- this method would make the remote http call
+      expect(projects).to.be.a("array")
+      expect(projects).to.have.deep.property("projects[0].id", 1)
+    })
+
+    // (5) validate the interactions you've registered and expected occurred
+    // this will throw an error if it fails telling you what went wrong
+    // This should be performed once per interaction test
+    afterEach(() => provider.verify())
   })
+
+  // (6) write the pact file for this consumer-provider pair,
+  // and shutdown the associated mock server.
+  // You should do this only _once_ per Provider you are testing,
+  // and after _all_ tests have run for that suite
+  after(() => provider.finalize())
 })
 ```
 
